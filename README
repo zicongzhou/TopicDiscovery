@@ -1,0 +1,40 @@
+Readme for WordNetClassifer, Zicong Zhou
+
+We can adjust the parameters of countCutOff, zCutOff and ifIdfCutOff to see if the concurrence network has community structure. 
+
+Step 1: build stem to words mapping. Since we use word stemming in the tokenization period, we want to keep the stem to words mapping to recognize stem later.In our wordsMap, we store for example: <"communit",<"community",4>>;<"communit",<"communities",2>> 
+<"communit",<"community",4>> means community has been stemmed to communit for 4 times. 
+Method called: setStemCountMap()
+
+Step 2: pick up words to match to stem based on the wordsMap. Use maximum likelihood to pick the most likely word being mapped to the stem. In the previous example, we will let communit mapped to community instead of communities. 
+Method Called: pickWordML();
+
+Step 3: compute the statistics of stems in each document. Stored as words statistics matrix in wordDocStat. In WordStat, we have the wordId, count, z score, ifidf in the document. 
+Method Called: findWordsStat();
+
+Step 4: build the concurrence network. For each word in the document, if the word is important (measured by the z score and ifidf) then includes it in the document. Then compute the concurrence of pairs of words.
+Method Called: buildNets();
+
+Step 5: print the wordsnet to the file. Output format is as follows: wordId1 wordId2 weight(weight can be measured by the conditional probability or pointwise mutual information)
+Method Called: printNets(outFile);
+
+Step 6: print the Vocabulary to the file. Output format is as follows: count wordId word
+Method Called: printVocab(vobFile);
+
+Definition of the variables in the class:
+// words statistics matrix
+WordStat[][] wordDocStat;
+// map between id and word
+SymbolTable symTab;
+// unigram, how many times words appear in the corpus
+int[] wordCorpCount;
+// how many document contain the words
+int[] wordDocCount;
+// the edge counts in the concurrence network
+Map<Edge, Integer> edgeWeight;
+// cut off for the count
+int countCutOff;
+// cut off for the z score
+double zCutOff;
+// cut off for tfidf
+double tfIdfCutOff;

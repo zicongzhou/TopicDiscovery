@@ -78,7 +78,7 @@ public class WordNetClassifier extends TopicClassifier {
 		readDocsFromMothering(dataCollection);
 	}
 	
-	public void setCutOff(int c, int z, int t){
+	public void setCutOff(int c, double z, double t){
 		countCutOff=c;
 		zCutOff=z;
 		tfIdfCutOff=t;
@@ -95,8 +95,7 @@ public class WordNetClassifier extends TopicClassifier {
 		int[][] docWords = LatentDirichletAllocation.tokenizeDocuments(text,
 				tokFactory, symTab, minCount);
 
-		System.out.println("total number of stemmed tokens "
-				+ symTab.numSymbols());
+		System.out.println("total number of stemmed tokens: "+ symTab.numSymbols());
 
 		wordCorpCount = new int[symTab.numSymbols()];
 		wordDocStat = new WordStat[docWords.length][];
@@ -130,7 +129,7 @@ public class WordNetClassifier extends TopicClassifier {
 							wordDocCount[wordId], docsArrays.size());
 					WordStat wStat = new WordStat(wordId, thisDoc.get(
 							wordId), zScore, tfIdf);
-					//
+					// use count, zScore and tfIdf score to filter the words
 					wStat.remove(countCutOff, zCutOff, tfIdfCutOff);
 					docStat[wordCounter++] = wStat;
 				}
@@ -218,7 +217,7 @@ public class WordNetClassifier extends TopicClassifier {
 					fstream, "UTF-8"));
 			for (int i = 0; i < symTab.numSymbols(); i++) {
 				String word = symTab.idToSymbol(i);
-				fout.write(wordCorpCount[i]+"\t"+i+stemToWord.get(word) + "\n");
+				fout.write(wordCorpCount[i]+"\t"+i+"\t"+stemToWord.get(word) + "\n");
 			}
 			fout.close();
 		} catch (Exception e) {
@@ -254,12 +253,12 @@ public class WordNetClassifier extends TopicClassifier {
 			wordsFile=args[2];
 		}
 		else{
-			threadFile="/media/netdisk/zzhou/vaccination/Thread.txt";
+			threadFile="/media/netdisk/zzhou/vaccination/ThreadTable.txt";
 			networkFile="/media/netdisk/zzhou/temp/net.dat";
 			wordsFile="/media/netdisk/zzhou/temp/vob_net.dat";
 		}
 		WordNetClassifier ex = new WordNetClassifier(threadFile);
-		ex.setCutOff(0,-2,0);
+		ex.setCutOff(1,-1.0,10.0);
 		ex.run(networkFile,wordsFile);
 	}
 
